@@ -25,8 +25,6 @@ YTIME   EQU    #300    ; ^ same but yellow
 ETIME   EQU    #100    ; use shorter yellow transition time for emergency stop
 TTIME   EQU    #250    ; transition time (between one dir turning red and the other turning green)
 
-; other addresses
-PREV    EQU    $
 
 ; initial setup
         ORG    $900
