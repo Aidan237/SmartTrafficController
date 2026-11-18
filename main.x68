@@ -33,7 +33,30 @@ START   MOVE.L #PCBTN,INT6  ; assign subroutines locations to interrupts
         MOVE.B #2,D4        ; set initial state for lights (both red)
 
 ; main loop
-MAIN    
+MAIN    CMP.B  #0,D4        ; check light state, branch accordingly
+        BEQ    GNS
+        CMP.B  #1,D4
+        BEQ    YNS
+        CMP.B  #2,D4
+        BEQ    RED
+        CMP.B  #3,D4
+        BEQ    YEW
+        CMP.B  #4,D4
+        BEQ    GEW
+        BRA    ERR          ; if light state invalid, branch to ERR
+
+GNS
+
+YNS
+
+RED
+
+YEW
+
+GEW
+
+ERR     BRA    START        ; placeholder - log error, then make lights flash red
+
 
 ; subroutines       
 
