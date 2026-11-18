@@ -20,9 +20,9 @@ LED     EQU    $E00010
 SWITCH  EQU    $E00012
 
 ; constants
-GTIME   EQU    $7FFFFFFF    ; time one direction spends on green by default, adjust as needed
-YTIME   EQU    $0FFFFFFF    ; ^ same but yellow
-ETIME   EQU    $07FFFFFF    ; use shorter yellow transition time for emergency stop
+GTIME   EQU    #1500   ; time one direction spends on green by default, (100 = 1 sec)
+YTIME   EQU    #300    ; ^ same but yellow
+ETIME   EQU    #100    ; use shorter yellow transition time for emergency stop
 
         ORG    $900
 START   MOVE.L #PCBTN,INT6  ; assign subroutines locations to interrupts
@@ -32,9 +32,19 @@ START   MOVE.L #PCBTN,INT6  ; assign subroutines locations to interrupts
 
 ; subroutines       
 
-TIMER   SUBI.B D3,#1        ; timer subroutine, set time amount via D3 before calling
-        BNE    TIMER
-        RTS
+TIMER   TST.L  D3           ; timer subroutine, set time amount via D3 before calling
+        BLE    TEND
+
+        MOVE.B #23,D0       ; built-in timer function, each call creates a 10ms delay
+        MOVE.L #1,D1
+        TRAP   #15
+
+        SUBQ.L #1,D3
+        BRA    TIMER
+
+TEND    RTS
+
+LOG     RTS                 ; log subroutine, write
 
 ; ISRs
 
