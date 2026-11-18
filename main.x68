@@ -7,8 +7,9 @@
 
 * Registers:
 * D0, D1, D2 = needed for built-in trap functions
-* D3 = Light State?
-* D4 = ?
+* D3 = Timer
+* D4 = Light State
+* D5 = ?
 
 ; interrupt vector table addresses
 INT6    EQU    $0078        ; pedestrian crossing button
@@ -31,7 +32,9 @@ START   MOVE.L #PCBTN,INT6  ; assign subroutines locations to interrupts
 
 ; subroutines       
 
-
+TIMER   SUBI.B D3,#1        ; timer subroutine, set time amount via D3 before calling
+        BNE    TIMER
+        RTS
 
 ; ISRs
 
