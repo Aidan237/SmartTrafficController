@@ -8,8 +8,8 @@
 * Registers:
 * D0, D1, D2 = needed for built-in trap functions
 * D3 = Timer
-* D4 = Light State (North-South) <- 0 = Red, 1 = Yellow, 2 = Green
-* D5 = Light State (East-West) <- 0 = Red, 1 = Yellow, 2 = Green
+* D4 = Light State <- 0 = Green (NS), 1 = Yellow (NS), 2 = Both Red, 3 = Yellow (EW), 4 = Green (EW)
+* D5 = ?
 
 ; interrupt vector table addresses
 INT6    EQU    $0078        ; pedestrian crossing button
@@ -30,8 +30,7 @@ TTIME   EQU    #250    ; transition time (between one dir turning red and the ot
 START   MOVE.L #PCBTN,INT6  ; assign subroutines locations to interrupts
         MOVE.L #EMERG,INT7
         MOVE.B $2500,SR     ; set status register to allow for lvl 6 and 7 interrupts
-        MOVE.B #2,D4        ; set initial states for both directions
-        MOVE.B #0,D5
+        MOVE.B #2,D4        ; set initial state for lights (both red)
 
 ; main loop
 MAIN    
