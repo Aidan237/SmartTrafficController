@@ -25,12 +25,16 @@ YTIME   EQU    #300    ; ^ same but yellow
 ETIME   EQU    #100    ; use shorter yellow transition time for emergency stop
 TTIME   EQU    #250    ; transition time (between one dir turning red and the other turning green)
 
+; other addresses
+PREV    EQU    $
+
 ; initial setup
         ORG    $900
 START   MOVE.L #PCBTN,INT6  ; assign subroutines locations to interrupts
         MOVE.L #EMERG,INT7
         MOVE.B $2500,SR     ; set status register to allow for lvl 6 and 7 interrupts
         MOVE.B #2,D4        ; set initial state for lights (both red)
+        MOVE.B #1,PREV      ; set initial prev flag: 0 = NS -> EW, 1 = EW -> NS [tells what state to switch to when both directions are red]
 
 ; main loop
 MAIN    CMP.B  #0,D4        ; check light state, branch accordingly
@@ -57,6 +61,8 @@ GEW
 
 ERR     BRA    START        ; placeholder - log error, then make lights flash red
 
+        SIMHALT             ; end of execution
+
 
 ; subroutines       
 
@@ -81,7 +87,8 @@ PCBTN   RTE                 ; pedestrian crossing button ISR (lvl 6)
 EMERG   RTE                 ; emergency vehicle detection ISR (lvl 7)
 
 ; data variables (DC.B, DC.W, etc.)
-
+        ORG    $3000
+PREV    DS.B   1            ; one byte flag to keep track of previous traffic direction
 
 
 
