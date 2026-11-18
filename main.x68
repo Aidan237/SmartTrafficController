@@ -69,10 +69,10 @@ YNS     MOVE.B #%01000100,LED
 RED     MOVE.B #%00100100,LED
         TST.B  PREV             ; set next light state based on previous state, then update previous state
         BEQ    RED0
-        MOVE.B #1,D4
+        MOVE.B #0,D4
         MOVE.B #0,PREV
         BRA    RED1
-RED0    MOVE.B #3,D4
+RED0    MOVE.B #4,D4
         MOVE.B #1,PREV
 
 RED1    MOVE.L #TTIME,D3
