@@ -11,6 +11,9 @@
 * D4 = Light State <- 0 = Green (NS), 1 = Yellow (NS), 2 = Both Red, 3 = Yellow (EW), 4 = Green (EW)
 * D5 = ?
 
+* LEDs:
+* 00000000 -> (NW Green, Yellow, Red), (EW Green, Yellow, Red), 0, Pedestrian Button Indicator
+
 ; interrupt vector table addresses
 INT6    EQU    $0078        ; pedestrian crossing button
 INT7    EQU    $007C        ; emergency vehicle detection
@@ -47,15 +50,51 @@ MAIN    CMP.B  #0,D4        ; check light state, branch accordingly
         BEQ    GEW
         BRA    ERR          ; if light state invalid, branch to ERR
 
-GNS
+GNS     MOVE.B #%10000100,LED
+        MOVE.B #1,D4
 
-YNS
+        MOVE.L #GTIME,D3
+        BSR    TIMER
 
-RED
+        BRA    MAIN
 
-YEW
+YNS     MOVE.B #%01000100,LED
+        MOVE.B #2,D4
 
-GEW
+        MOVE.L #YTIME,D3
+        BSR    TIMER
+
+        BRA MAIN
+
+RED     MOVE.B #%00100100,LED
+        TST.B  PREV             ; set next light state based on previous state, then update previous state
+        BEQ    RED0
+        MOVE.B #1,D4
+        MOVE.B #0,PREV
+        BRA    RED1
+RED0    MOVE.B #3,D4
+        MOVE.B #1,PREV
+
+RED1    MOVE.L #TTIME,D3
+        BSR    TIMER
+
+        BRA    MAIN
+
+YEW     MOVE.B #%00101000,LED
+        MOVE.B #2,D4
+
+        MOVE.L #YTIME,D3
+        BSR    TIMER
+
+        BRA    MAIN
+
+GEW     MOVE.B #%00110000,LED
+        MOVE.B #3,D4
+
+        MOVE.L #GTIME,D3
+        BSR    TIMER
+
+        BRA    MAIN
 
 ERR     BRA    START        ; placeholder - log error, then make lights flash red
 
