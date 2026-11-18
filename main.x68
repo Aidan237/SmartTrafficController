@@ -23,10 +23,10 @@ LED     EQU    $E00010
 SWITCH  EQU    $E00012
 
 ; constants
-GTIME   EQU    #1500   ; time one direction spends on green by default, (100 = 1 sec)
-YTIME   EQU    #300    ; ^ same but yellow
-ETIME   EQU    #100    ; use shorter yellow transition time for emergency stop
-TTIME   EQU    #250    ; transition time (between one dir turning red and the other turning green)
+GTIME   EQU    1500         ; time one direction spends on green by default, (100 = 1 sec)
+YTIME   EQU    300          ; ^ same but yellow
+ETIME   EQU    100          ; use shorter yellow transition time for emergency stop
+TTIME   EQU    250          ; transition time (between one dir turning red and the other turning green)
 
 
 ; initial setup
