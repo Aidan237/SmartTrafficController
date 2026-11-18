@@ -33,7 +33,7 @@ TTIME   EQU    250          ; transition time (between one dir turning red and t
         ORG    $900
 START   MOVE.L #PCBTN,INT6  ; assign subroutines locations to interrupts
         MOVE.L #EMERG,INT7
-        MOVE.B $2500,SR     ; set status register to allow for lvl 6 and 7 interrupts
+        MOVE.W $2500,SR     ; set status register to allow for lvl 6 and 7 interrupts
         MOVE.B #2,D4        ; set initial state for lights (both red)
         MOVE.B #1,PREV      ; set initial prev flag: 0 = NS -> EW, 1 = EW -> NS [tells what state to switch to when both directions are red]
 
