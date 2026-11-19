@@ -51,22 +51,28 @@ MAIN    CMP.B  #0,D4        ; check light state, branch accordingly
         BRA    ERR          ; if light state invalid, branch to ERR
 
 GNS     MOVE.B #%10000100,LED
-        MOVE.B #1,D4
 
         MOVE.L #GTIME,D3
         BSR    TIMER
 
+        MOVE.B #1,D4
+
         BRA    MAIN
 
 YNS     MOVE.B #%01000100,LED
-        MOVE.B #2,D4
 
         MOVE.L #YTIME,D3
         BSR    TIMER
 
+        MOVE.B #2,D4
+
         BRA MAIN
 
 RED     MOVE.B #%00100100,LED
+
+        MOVE.L #TTIME,D3
+        BSR    TIMER
+
         TST.B  PREV             ; set next light state based on previous state, then update previous state
         BEQ    RED0
         MOVE.B #0,D4
@@ -75,24 +81,23 @@ RED     MOVE.B #%00100100,LED
 RED0    MOVE.B #4,D4
         MOVE.B #1,PREV
 
-RED1    MOVE.L #TTIME,D3
-        BSR    TIMER
-
-        BRA    MAIN
+RED1    BRA    MAIN
 
 YEW     MOVE.B #%00101000,LED
-        MOVE.B #2,D4
 
         MOVE.L #YTIME,D3
         BSR    TIMER
 
+        MOVE.B #2,D4
+
         BRA    MAIN
 
 GEW     MOVE.B #%00110000,LED
-        MOVE.B #3,D4
 
         MOVE.L #GTIME,D3
         BSR    TIMER
+
+        MOVE.B #3,D4
 
         BRA    MAIN
 
@@ -119,7 +124,19 @@ LOG     RTS                 ; log subroutine, write
 
 ; ISRs
 
-PCBTN   RTE                 ; pedestrian crossing button ISR (lvl 6)
+PCBTN   TST.L  D3           ; pedestrian crossing button ISR (lvl 6)
+        BEQ    PCBTNE
+        CMP.B  #1,D4        ; check that state is green (0 or 4)
+        BEQ    PCBTNE
+        CMP.B  #2,D4
+        BEQ    PCBTNE
+        CMP.B  #3,D4
+        BEQ    PCBTNE
+
+        BSET.B #0,LED       ; turn on pedestrian crossing button light
+        ASR.L  #1,D3        ; divide current green light time by 2
+
+PCBTNE  RTE
 
 EMERG   RTE                 ; emergency vehicle detection ISR (lvl 7)
 
