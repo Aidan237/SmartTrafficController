@@ -14,6 +14,9 @@
 * LEDs:
 * 00000000 -> (NW Green, Yellow, Red), (EW Green, Yellow, Red), 0, Pedestrian Button Indicator
 
+* Switches:
+* 00000000 -> (NW Traffic Detected, EW Traffic Detected), 00000, Emergency Vehicle Direction
+
 ; interrupt vector table addresses
 INT6    EQU    $0078        ; pedestrian crossing button
 INT7    EQU    $007C        ; emergency vehicle detection
@@ -73,12 +76,27 @@ RED     MOVE.B #%00100100,LED
         MOVE.L #TTIME,D3
         BSR    TIMER
 
+        MOVE.B SWITCH,D6        
+        ANDI.B #%11000000,D6    ; filter out all switches except first two
+        CMP.B  #%10000000,D6    ; check if only one switch is on
+        BEQ    REDNS
+        CMP.B  #%01000000,D6
+        BEQ    REDEW
+
         TST.B  PREV             ; set next light state based on previous state, then update previous state
         BEQ    RED0
         MOVE.B #0,D4
         MOVE.B #0,PREV
         BRA    RED1
 RED0    MOVE.B #4,D4
+        MOVE.B #1,PREV
+        BRA    RED1
+
+REDNS   MOVE.B #0,D4            ; if only NW has traffic, make NW green again
+        MOVE.B #0,PREV
+        BRA    RED1
+
+REDEW   MOVE.B #4,D4            ; if only EW has traffic, make EW green again
         MOVE.B #1,PREV
 
 RED1    BRA    MAIN
