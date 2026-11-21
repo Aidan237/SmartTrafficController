@@ -138,7 +138,33 @@ PCBTN   TST.L  D3           ; pedestrian crossing button ISR (lvl 6)
 
 PCBTNE  RTE
 
-EMERG   RTE                 ; emergency vehicle detection ISR (lvl 7)
+EMERG   MOVE.B SWITCH,D5       ; read emergency direction
+        BTST   #0,D5
+        BNE    EMEW            ; S0 = 1 -> EW emergency
+
+; NS emergency
+EMNS    CMP.B  #0,D4           ; NS already green?
+        BEQ    EXTNS
+
+        MOVE.B #1,PREV         ; next green = NS
+        MOVE.L #ETIME,D3       ; shorten current state
+        BRA    EMERGE
+
+EXTNS   ADD.L  #GTIME,D3       ; extend NS green time
+        BRA    EMERGE
+
+
+; EW emergency
+EMEW    CMP.B  #4,D4           ; EW already green?
+        BEQ    EXTEW
+ 
+        MOVE.B #0,PREV         ; next green = EW
+        MOVE.L #ETIME,D3       ; shorten current state
+        BRA    EMERGE
+ 
+EXTEW   ADD.L  #GTIME,D3       ; extend EW green time
+ 
+EMERGE  RTE                 
 
 ; data variables (DC.B, DC.W, etc.)
         ORG    $3000
